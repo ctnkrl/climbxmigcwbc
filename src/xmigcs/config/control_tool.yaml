@@ -1,0 +1,205 @@
+control_tool: joystick # joystick, xbox, keyboard
+
+joystick:
+  long_press_thresholds:
+    a: 1.0
+    b: 1.0
+    c: 0.5
+
+  # press_counters: 标量为最小间隔（秒）；也可用 dict 同时设 max_interval，超过该间隔再按下且计数非零则先清零序列
+  # 例: c: { min_interval: 0.4, max_interval: 1.2 }
+  press_counters:
+    a:
+      min_interval: 0.4
+      max_interval: 0.5
+    b:
+      min_interval: 0.4
+      max_interval: 1.0
+    c:
+      min_interval: 0.025
+      max_interval: 0.6
+    d:
+      min_interval: 0.4
+      max_interval: 1.0
+
+  initial_height: 0.957
+  max_height: 0.991
+  min_height: 0.791
+  x_command_offset: 0.0
+  y_command_offset: 0.0
+  yaw_command_offset: 0.0
+  max_x_plus_speed: 2.2
+  max_x_minus_speed: 0.8
+  max_y_speed: 0.5
+  max_yaw_speed: 2.0
+  # 状态速度配置
+  state_speed_limits:
+    NAVIGATE:
+      max_x_plus: 1.2
+      max_x_minus: 0.6
+      max_y: 0.6
+      max_yaw: 1.0
+      x_command_offset: 0.0
+      y_command_offset: 0.0
+      yaw_command_offset: 0.0
+    STAND_NAV_MOE:
+      max_x_plus: 1.2
+      max_x_minus: 0.6
+      max_y: 0.6
+      max_yaw: 1.0
+      x_command_offset: 0.0
+      y_command_offset: 0.0
+      yaw_command_offset: 0.0
+    HBWALK:
+      max_x_plus: 0.8
+      max_x_minus: 0.4
+      max_y: 0.6
+      max_yaw: 1.0
+      x_command_offset: 0.0
+      y_command_offset: 0.0
+      yaw_command_offset: 0.0
+    SWR:
+      max_x_plus: 2.2
+      max_x_minus: 0.8
+      max_y: 0.5
+      max_yaw: 2.0
+      x_command_offset: 0.0
+      y_command_offset: 0.0
+      yaw_command_offset: 0.0
+      walk_max_x_plus: 1.1
+      run_zone_start: 0.9
+      run_ramp_time: 5.0
+    # START:
+    #   max_x_plus: 1.0
+    #   max_x_minus: 0.5
+    #   max_y: 0.5
+    #   max_yaw: 1.0
+    #   x_command_offset: 0.0
+    #   y_command_offset: 0.0
+    #   yaw_command_offset: 0.0
+    # WALKAMP:
+    #   max_x_plus: 1.0
+    #   max_x_minus: 0.5
+    #   max_y: 0.5
+    #   max_yaw: 3.0
+    #   x_command_offset: 0.0
+    #   y_command_offset: 0.0
+    #   yaw_command_offset: 0.0
+
+  # e 上拨时禁用行走等控制（长按 c 仍可触发 gotoSTOP）
+  enable_switch:
+    button: e
+    disabled_value: -1.0
+
+  # FSM 状态命令映射：规则按顺序匹配，后匹配的可覆盖 command（只负责切状态）
+  # resume_command: 单次恢复命令（如 kneeldownnoarm 保持阶段继续动作），写入 fsm_resume_command
+  # 摇杆副作用统一见 fsm_command_actions
+  # when.switch_count: e/f/g/h 中非零拨杆数量
+  # when.buttons: 按键/拨杆期望值（1.0 按下，-1.0 松开/左拨，0.0 中位）
+  # when.press: 短按 short / 长按 long（由 long_press_thresholds 判定）
+  # when.press_count: 有效按下次数（见 press_counters）
+  fsm_command_rules:
+    - when: {switch_count: 0, buttons: {d: 1.0}}
+      command: gotoZERO
+
+    - when: {switch_count: 0, buttons: {a: 1.0}, press: {a: long}}
+      command: gotoSTART
+
+    - when: {switch_count: 1, buttons: {h: -1.0}}
+      command: gotoHBWALK
+
+    - when: {switch_count: 1, buttons: {h: 1.0, a: 1.0}, press_count: {b: 1}}
+      command: gotoNIUKUA
+      reset_press_count: [b]
+
+    - when: {switch_count: 1, buttons: {h: 1.0, a: 1.0}, press_count: {b: 2}}
+      command: gotoPUSHUP
+      reset_press_count: [b]
+    
+    # PUSHUP resume
+    - when: {switch_count: 1, buttons: {h: 1.0, d: 1.0}}
+      resume_command: pushup_resume
+
+    - when: {switch_count: 1, buttons: {h: 1.0, a: 1.0}, press_count: {b: 3}}
+      command: gotoNEWISLAND
+      reset_press_count: [b]
+
+    - when: {switch_count: 1, buttons: {h: 1.0, a: 1.0}, press_count: {b: 4}}
+      command: gotoTHOMAS
+      reset_press_count: [b]
+
+    - when: {switch_count: 1, buttons: {h: 1.0, a: 1.0}, press_count: {b: 5}}
+      command: gotoDANCE29
+      reset_press_count: [b]
+
+    - when: {switch_count: 1, buttons: {f: 1.0}, press: {a: long}}
+      command: gotoSTANDTSIT
+
+    - when: {switch_count: 1, buttons: {f: 1.0}, press: {b: long}}
+      command: gotoLIEDOWN
+
+    - when: {switch_count: 1, buttons: {g: -1.0, a: 1.0}}
+      command: gotoNAVIGATE
+
+    - when: {switch_count: 1, buttons: {g: -1.0, b: 1.0}}
+      command: gotoSTAND
+
+    - when: {switch_count: 2, buttons: {f: 1.0, h: 1.0}, press: {a: long}}
+      command: gotoSITPACK
+
+    - when: {switch_count: 2, buttons: {f: 1.0, h: 1.0}, press: {b: long}}
+      command: gotoSITRISE
+
+    - when: {switch_count: 2, buttons: {g: -1.0, e: 1.0, a: 1.0}}
+      command: gotoFAN
+
+    - when: {switch_count: 2, buttons: {g: -1.0, e: 1.0, b: 1.0}}
+      command: gotoTHOMAS
+
+    - when: {switch_count: 2, buttons: {g: -1.0, e: 1.0, d: 1.0}}
+      command: gotoBACK_FLIP
+
+    - when: {switch_count: 2, buttons: {g: -1.0, h: 1.0, a: 1.0}}
+      command: gotoKNEELDOWNNOARM
+    
+    # KNEELDOWNNOARM resume
+    - when: {switch_count: 2, buttons: {g: -1.0, h: 1.0, b: 1.0}}
+      resume_command: resume
+
+    - when: {switch_count: 2, buttons: {g: -1.0, h: -1.0, a: 1.0}}
+      command: gotoSTAIRS
+
+  # 当前 FSM 命令对应的每帧摇杆副作用（command 名 -> actions）
+  fsm_command_actions:
+    gotoSTART: [swr_x_y_yaw_speed]
+    gotoHBWALK: [x_y_yaw_speed]
+    gotoNAVIGATE: [x_y_yaw_speed]
+    gotoSTAND: [rpyz]
+
+  # 全局急停：任意时刻匹配后覆盖 command
+  fsm_stop_rule:
+    when:
+      any:
+        - press_count_at_least: {c: 2}
+        - press: {c: long}
+    command: gotoSTOP
+    reset_press_count: [c]
+    log_warning: true
+
+keyboard:
+  initial_height: 0.90
+  forward_command_offset: 0.0
+  lateral_command_offset: 0.0
+  rotation_command_offset: 0
+  height_step: 0.05
+  max_forward_speed: 1.5
+  max_lateral_speed: 0.5
+  max_rotation_speed: 0.8
+
+xbox:
+  # 其他配置参数
+  initial_height: 0.89
+  forward_command_offset: 0.0
+  lateral_command_offset: 0.0
+  rotation_command_offset: 0.0
+  height_step: 0.05

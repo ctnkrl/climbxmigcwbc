@@ -1,0 +1,52 @@
+# gain_joint_names: [
+#   "hip_roll_l_joint", "hip_pitch_l_joint", "hip_yaw_l_joint", "knee_pitch_l_joint", "ankle_pitch_l_joint", "ankle_roll_l_joint",
+#   "hip_roll_r_joint", "hip_pitch_r_joint", "hip_yaw_r_joint", "knee_pitch_r_joint", "ankle_pitch_r_joint", "ankle_roll_r_joint",
+#   "waist_roll_joint", "waist_pitch_joint"  
+# ]
+
+kp: [
+  300.0, 300.0, 150.0, 350.0, 30.0, 16.8,
+  300.0, 300.0, 150.0, 350.0, 30.0, 16.8,
+  400.0, 400.0, 400.0,
+]
+
+kd_stand: [
+  20.0, 20.0, 10.0, 20.0, 5.0, 2.8,
+  20.0, 20.0, 10.0, 20.0, 5.0, 2.8,
+  5.0, 35.0, 20.0,
+]
+
+kd_navigate: [
+  10.0, 10.0, 5.0, 10.0, 2.5, 1.4,
+  10.0, 10.0, 5.0, 10.0, 2.5, 1.4,
+  5.0, 10.0, 10.0,
+]
+
+# 站立默认高度 (与dex_config.yaml中的initial_height保持一致)
+stand_default_height: 0.965
+
+# 命令滤波器参数
+# low/high: clip范围
+# rate_limit: 斜率限制 delta/s
+# alpha: 指数滤波系数, 1.0不滤波, 0.0全等于last
+cmd_filter:
+  roll:
+    low: -0.15
+    high: 0.15
+    rate_limit: 1.2
+    alpha: 0.2
+  pitch:
+    low: -0.2
+    high: 0.4
+    rate_limit: 1.2
+    alpha: 0.2
+  yaw:
+    low: -1.5
+    high: 1.5
+    rate_limit: 3.0
+    alpha: 0.2
+  height:
+    low: 0.6
+    high: 0.98
+    rate_limit: 0.8
+    alpha: 0.2

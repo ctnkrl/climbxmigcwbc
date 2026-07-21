@@ -1,0 +1,58 @@
+onnx_path: "YYW_0409_2.onnx"
+warm_start_time: 0.0
+
+body_names : [
+    "pelvis",
+    "hip_pitch_l_link",
+    "hip_roll_l_link",
+    "hip_yaw_l_link",
+    "knee_pitch_l_link",
+    "ankle_pitch_l_link",
+    "ankle_roll_l_link",
+    "hip_pitch_r_link",
+    "hip_roll_r_link",
+    "hip_yaw_r_link",
+    "knee_pitch_r_link",
+    "ankle_pitch_r_link",
+    "ankle_roll_r_link",
+    "waist_yaw_link",
+    "waist_roll_link",
+    "waist_pitch_link",
+    "shoulder_pitch_l_link",
+    "elbow_pitch_l_link",
+    "shoulder_pitch_r_link",
+    "elbow_pitch_r_link",
+]
+anchor_body : "pelvis"
+
+num_obs : 124
+
+locked_joint_map : [
+ 0, 1, 2, 3, 4, 5,
+ 6, 7, 8, 9, 10, 11,
+ 12, 13, 14,
+ 15, 16, 17, 18, 
+ 22, 23, 24, 25 
+]
+
+kps: [
+        300, 300, 150, 350, 30, 16.8,
+        300, 300, 150, 350, 30, 16.8,
+        400, 400, 400,
+        100.0, 100.0, 90.0, 90.0, 20.0, 20.0, 20.0,
+        100.0, 100.0, 90.0, 90.0, 20.0, 20.0, 20.0,
+]
+kds: [
+        15, 15, 7.5, 15, 3.75, 2.1,
+        15, 15, 7.5, 15, 3.75, 2.1,
+        41, 41, 41,
+        7.4, 7.4, 5.9, 5.9, 1.40, 1.40, 1.40,
+        7.4, 7.4, 5.9, 5.9, 1.40, 1.40, 1.40,
+]
+motion_length: 3535
+
+num_actions: 23
+motor_nums: 29
+hold_final_reference: false
+physical_dt: 0.01
+decimation: 1

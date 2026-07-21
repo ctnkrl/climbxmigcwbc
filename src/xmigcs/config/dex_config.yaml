@@ -1,0 +1,550 @@
+motor_num: 31        # 电机数量
+# actions_size: 12     # action的大小
+dt: 0.01
+
+sim: false # 默认为false，无需修改
+
+debug: false
+
+states:
+  STOP: 0
+  STANDZERO: 1
+  HBWALK: 2
+  # KNEELDOWNUP: 3
+  DAMPING: 4
+  # NOGRAVITY: 5
+  # BEYONDZERO: 6
+  # KNEELDOWN: 7
+  # STAND: 8
+  # NAVIGATE: 9
+  # WALKAMP: 10
+  NIUKUA: 11
+  SWR: 12
+  LAYUPZERO: 13
+  LAYUP: 14
+  # CHAIRDOWNUP: 13
+  KNEELDOWNNOARM: 15
+  # PANOARM: 15
+  HYL: 16
+  SITRISEZERO: 17
+  SITRISE: 18
+  NEWISLAND: 19
+  LIEDOWN: 20
+  SITPACK: 21
+  THOMAS: 22
+  PUSHUP: 23
+  FAN: 24
+  BACK_FLIP: 28  # 后空翻策略；把 back_flip/model/ 模型放好后取消注释即可启用
+  STANDTSIT: 25
+  SITTSTAND: 26
+  STAND_NAV_MOE: 27
+  STAIRS: 29
+  DANCE29: 30
+
+init_state: STOP
+transitions:
+  gotoSTART:
+    - {from: STANDZERO, to: SWR}
+    - {from: SWR, to: SWR}
+    - {from: HBWALK, to: SWR}
+    - {from: NIUKUA, to: SWR}
+    - {from: HYL, to: SWR}
+    - {from: LAYUPZERO, to: LAYUP}
+    - {from: LAYUP, to: SWR}
+    - {from: SITRISEZERO, to: SITTSTAND}
+    - {from: SITTSTAND, to: SWR}
+    - {from: THOMAS, to: SWR}
+    - {from: PUSHUP, to: SWR}
+    - {from: FAN, to: SWR}
+    - {from: BACK_FLIP, to: SWR}
+    - {from: NEWISLAND, to: SWR}
+    - {from: STAND_NAV_MOE, to: SWR}
+    - {from: NAVIGATE, to: SWR}
+    - {from: WALKAMP, to: WALKAMP}
+    - {from: STANDZERO, to: WALKAMP}
+    - {from: HBWALK, to: WALKAMP}
+    - {from: NIUKUA, to: WALKAMP}
+    - {from: HYL, to: WALKAMP}
+    - {from: LAYUPZERO, to: LAYUP}
+    - {from: LAYUP, to: WALKAMP}
+    - {from: SITTSTAND, to: WALKAMP}
+    - {from: THOMAS, to: WALKAMP}
+    - {from: PUSHUP, to: WALKAMP}
+    - {from: FAN, to: WALKAMP}
+    - {from: BACK_FLIP, to: WALKAMP}
+    - {from: NEWISLAND, to: WALKAMP}
+    - {from: STAIRS, to: WALKAMP}
+    - {from: STAIRS, to: SWR}
+    - {from: DANCE29, to: SWR}
+    - {from: DANCE29, to: WALKAMP}
+
+  gotoSTOP: # 进入停止状态, 所有状态都可以进入停止状态，自动注册切换到STOP状态，无需在配置文件中添加
+    - {from: STOP, to: STOP}
+    # - {from: ZERO, to: STOP}
+    - {from: HBWALK, to: STOP}
+    # - {from: KNEELDOWNUP, to: STOP}
+    - {from: DAMPING, to: STOP}
+    - {from: NOGRAVITY, to: STOP}
+    - {from: STAND, to: STOP}
+
+  gotoZERO:
+    # - {from: ZERO, to: ZERO}
+    # - {from: STOP, to: ZERO}
+    # - {from: NOGRAVITY, to: ZERO}
+    - {from: STOP, to: ["LAYUPZERO", "SITRISEZERO", "STANDZERO"]}
+    # - {from: STOP, to: SITDOWNZERO}
+    # - {from: STOP, to: STANDZERO}
+    - {from: STANDZERO, to: STANDZERO}
+    - {from: LAYUPZERO, to: LAYUPZERO}
+    - {from: SITRISEZERO, to: SITRISEZERO}
+
+  gotoHBWALK:
+    - {from: HBWALK, to: HBWALK}
+    # - {from: ZERO, to: HBWALK}
+    - {from: STAND, to: HBWALK}
+    - {from: SWR, to: HBWALK}
+    - {from: NAVIGATE, to: HBWALK}
+    - {from: CHAIRDOWNUP, to: HBWALK}
+    - {from: STAND_NAV_MOE, to: HBWALK}
+    # - {from: KNEELDOWNUP, to: HBWALK}
+    - {from: KNEELDOWNNOARM, to: HBWALK}
+
+  # gotoKNEELDOWNUP:
+  #   - {from: KNEELDOWNUP, to: KNEELDOWNUP}
+  #   - {from: HBWALK, to: KNEELDOWNUP}
+  #   - {from: STAND, to: KNEELDOWNUP}
+
+  gotoDAMPING: # 进入阻尼状态, 所有状态都可以进入阻尼状态，自动注册切换到DAMPING状态，无需在配置文件中添加
+    - {from: DAMPING, to: DAMPING}
+    - {from: STOP, to: DAMPING}
+
+  # gotoKNEELDOWN:
+  #   - {from: KNEELDOWN, to: KNEELDOWN}
+  #   - {from: HBWALK, to: KNEELDOWN}
+  #   - {from: STAND, to: KNEELDOWN}
+  
+  gotoSTAND:
+    - {from: STAND, to: STAND}
+    - {from: HBWALK, to: STAND}
+    - {from: NAVIGATE, to: STAND}
+    - {from: STAND_NAV_MOE, to: STAND_NAV_MOE}
+    - {from: HBWALK, to: STAND_NAV_MOE}
+    # - {from: SWR, to: STAND}  # test
+    # - {from: SWR, to: STAND_NAV_MOE}
+
+  gotoNOGRAVITY:
+    - {from: NOGRAVITY, to: NOGRAVITY}
+    - {from: ZERO, to: NOGRAVITY}
+    
+  
+
+
+  gotoNIUKUA:
+    - {from: NIUKUA, to: NIUKUA}
+    - {from: SWR, to: NIUKUA}
+    - {from: WALKAMP, to: NIUKUA}
+    # - {from: HYL, to: NIUKUA}
+
+  # gotoSWR:
+  #   - {from: SWR, to: SWR}
+  #   - {from: ZERO, to: SWR}
+  #   - {from: WALKAMP, to: SWR}
+  #   - {from: HBWALK, to: SWR}
+  #   # - {from: NAVIGATE, to: SWR}
+  #   - {from: NIUKUA, to: SWR}
+  #   - {from: HYL, to: SWR}
+
+    
+  gotoNAVIGATE:
+    - {from: NAVIGATE, to: NAVIGATE}
+    - {from: SWR, to: NAVIGATE}
+    - {from: STAND, to: NAVIGATE}
+    - {from: HBWALK, to: NAVIGATE}
+    - {from: STAND_NAV_MOE, to: STAND_NAV_MOE}
+    - {from: SWR, to: STAND_NAV_MOE}
+    - {from: HBWALK, to: STAND_NAV_MOE}
+    - {from: KNEELDOWNNOARM, to: NAVIGATE}
+    - {from: KNEELDOWNNOARM, to: STAND_NAV_MOE}
+
+
+  gotoCHAIRDOWNUP:
+    - {from: CHAIRDOWNUP, to: CHAIRDOWNUP}
+    - {from: HBWALK, to: CHAIRDOWNUP}
+    - {from: STAND, to: CHAIRDOWNUP}
+
+  gotoKNEELDOWNNOARM:
+    - {from: KNEELDOWNNOARM, to: KNEELDOWNNOARM}
+    - {from: HBWALK, to: KNEELDOWNNOARM}
+    - {from: STAND, to: KNEELDOWNNOARM}
+    - {from: SWR, to: KNEELDOWNNOARM}
+    - {from: NAVIGATE, to: KNEELDOWNNOARM}
+    - {from: STAND_NAV_MOE, to: KNEELDOWNNOARM}
+
+
+
+  gotoPANOARM:
+    - {from: PANOARM, to: PANOARM}
+    - {from: HBWALK, to: PANOARM}
+    - {from: STAND, to: PANOARM}
+
+  # gotoLAYUPZERO:
+  #   - {from: LAYUPZERO, to: LAYUPZERO}
+  #   - {from: STOP, to: LAYUPZERO}
+
+  # gotoLAYUP:
+  #   - {from: LAYUP, to: LAYUP}
+  #   - {from: LAYUPZERO, to: LAYUP}
+
+  gotoHYL:
+    - {from: HYL, to: HYL}
+    - {from: SWR, to: HYL}
+    # - {from: NIUKUA, to: HYL}
+    - {from: WALKAMP, to: HYL}
+  
+  gotoLIEDOWN:
+    - {from: LIEDOWN, to: LIEDOWN}
+    - {from: SWR, to: LIEDOWN}
+    - {from: WALKAMP, to: LIEDOWN}
+
+  gotoNEWISLAND:
+    - {from: NEWISLAND, to: NEWISLAND}
+    - {from: SWR, to: NEWISLAND}
+    - {from: WALKAMP, to: NEWISLAND}
+
+  gotoTHOMAS:
+    - {from: THOMAS, to: THOMAS}
+    - {from: SWR, to: THOMAS}
+    - {from: WALKAMP, to: THOMAS}
+
+  gotoPUSHUP:
+    - {from: PUSHUP, to: PUSHUP}
+    - {from: SWR, to: PUSHUP}
+    - {from: WALKAMP, to: PUSHUP}
+
+  gotoFAN:
+    - {from: FAN, to: FAN}
+    - {from: SWR, to: FAN}
+    - {from: WALKAMP, to: FAN}
+
+  gotoBACK_FLIP:
+    - {from: BACK_FLIP, to: BACK_FLIP}
+    - {from: SWR, to: BACK_FLIP}
+    - {from: WALKAMP, to: BACK_FLIP}
+
+  gotoSTANDTSIT:
+    - {from: STANDTSIT, to: STANDTSIT}
+    - {from: SWR, to: STANDTSIT}
+    - {from: WALKAMP, to: STANDTSIT}
+
+  gotoSITPACK:
+    - {from: SITPACK, to: SITPACK}
+    - {from: SWR, to: SITPACK}
+    - {from: WALKAMP, to: SITPACK}
+  
+  gotoSITRISE:
+    - {from: SITRISE, to: SITRISE}
+    - {from: SITRISEZERO, to: SITRISE}
+
+  gotoSTAIRS:
+    - {from: STAIRS, to: STAIRS}
+    - {from: SWR, to: STAIRS}
+    - {from: WALKAMP, to: STAIRS}
+    
+  gotoDANCE29:
+    - {from: DANCE29, to: DANCE29}
+    - {from: SWR, to: DANCE29}
+    - {from: WALKAMP, to: DANCE29}
+# HRIC 反向 RPC Server 配置
+# robot_control 作为 client 将 /hric/robot/* 命令通过 RPC 转发到本进程 (xmigcs).
+#   enabled=false 时, 仍可走传统的 ROS2 订阅路径 (需取消 robot_interface.py 中 5 个
+#   /hric/* 订阅的注释; 当前默认已删除这些订阅, 推荐 enabled=true).
+#
+# comm_mode: 三选一, **无 fallback**, 必须与 robot_control 端 --hric-comm-mode 一致:
+#   - "lpc"      HricLpcRegistry 全局单例, 同进程零开销直调
+#                仅当 robot_control 通过 pybind11/embed.h 内嵌 Python (RLPythonExecutor 模式)
+#                加载 xmigcs 时可用, robot_control 端 --hric-comm-mode lpc
+#   - "shm_rpc"  iceoryx2 共享内存, 服务名 shm_service_name (**默认**, 零拷贝, 同机最快)
+#                需要 robot_control 编译时启用 RPC_ENABLE_ICEORYX2 (x86_64 默认开)
+#   - "tcp_rpc"  coro_rpc TCP, 监听 tcp_port (跨机/进程, fallback / 调试)
+#
+# tcp_port / shm_service_name 仅在对应 comm_mode 下生效, 其余 mode 忽略.
+hric_server:
+  # HRIC 反向 RPC 通信模式: lpc / shm_rpc / tcp_rpc
+  #   - shm_rpc : iceoryx2 共享内存, 同机零拷贝最快 (**默认**). 启动顺序: 先 robot_control 后 xmigcs
+  #               (robot_control HRIC client 先创 service → xmigcs server attach; 与底层电机 RPC 一致)
+  #   - tcp_rpc : coro_rpc TCP, 跨进程 fallback / 调试, 不挑启动顺序 (client 内部重连)
+  #   - lpc     : 同进程零开销, 仅当 xmigcs 嵌入 robot_control 进程 (RLPythonExecutor) 时可用.
+  # 必须与 robot_control 端 --hric-comm-mode 一致, 否则两端各说各话.
+  comm_mode: shm_rpc
+  tcp_port: 50052                     # 仅 comm_mode=tcp_rpc 生效, 与 robot_control --hric-tcp-port 一致
+  shm_service_name: "XmigcsHricRPC"   # 仅 comm_mode=shm_rpc 生效
+
+robot_interface:
+  clip_actions: false
+  # 运控话题发布频率，单位 Hz；配置为 0 或负数时跟随控制循环每周期发布
+  motion_control_topic_publish_hz: 50.0
+  head_control_status:  # 这些状态下头部受控
+    - STANDZERO
+    - LAYUPZERO
+    - SITRISEZERO
+  waist_control_status:  # 这些状态下腰部受控制
+    # - HBWALK  # 15/23dof
+    - STANDZERO
+    - STOP
+    - NAVIGATE
+    - STAND_NAV_MOE
+    - STAND
+    - DAMPING
+    - NIUKUA
+    - NOGRAVITY
+    - SWR
+    - LAYUP
+    - LAYUPZERO
+    - HYL
+    - LIEDOWN
+    - SITRISEZERO
+    - SITRISE
+    - SITPACK
+    - NEWISLAND
+    - THOMAS
+    - PUSHUP
+    - FAN
+    - BACK_FLIP
+    - SITRISE
+    - STANDTSIT
+    - SITTSTAND
+    - WALKAMP
+    - PANOARM
+    - KNEELDOWNNOARM
+    - STAIRS
+    - DANCE29
+  legs_control_status: [] #空代表都允许控制，仅腿部是这个逻辑
+  arms_control_status:  # 这些状态下手臂受控制
+    # - HBWALK  # 23dof
+    - STANDZERO
+    - STOP
+    - DAMPING
+    - NIUKUA
+    - NOGRAVITY
+    - SWR
+    - LAYUP
+    - LAYUPZERO
+    - HYL
+    - LIEDOWN
+    - SITRISEZERO
+    - SITRISE
+    - SITPACK
+    - NEWISLAND
+    - THOMAS
+    - PUSHUP
+    - FAN
+    - BACK_FLIP
+    - SITRISE
+    - STANDTSIT
+    - SITTSTAND
+    - WALKAMP
+    - STAIRS
+    - DANCE29
+  left_arm_only_status: []
+  right_arm_only_status: []
+  dynamic_inter_status:  # 需要根据双臂位置计算力矩进行动力学插值
+    - HBWALK
+    - STAND
+    - STAND_NAV_MOE
+  imu_ypr_offset: [0.0, 0.0, 0.0] # 角度偏移，单位：度
+  zero_pos: [
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        0.0, 0.0, 0.0,
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        0.0, 0.0
+      ]
+  # 电流转力矩系数
+  # ct_scale: [
+  #           2.1, 2.1, 3.207, 2.673, 2.6, 2.6,
+  #           2.1, 2.1, 3.207, 2.673, 2.6, 2.6,
+  #           3.207, 3.207, 3.207,
+  #           3.207, 2.28, 5.89, 5.89, 3.35, 2.3, 2.3,
+  #           3.207, 2.28, 5.89, 5.89, 3.35, 2.3, 2.3
+  #     ]
+  ct_scale_sim: [
+            1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0,
+      ]
+  ct_scale_real: [
+            2.1, 2.1, 2.44, 3.26, 2.6, 2.6,
+            2.1, 2.1, 2.44, 3.26, 2.6, 2.6,
+            3.2, 2.44, 2.44,
+            2.1, 2.35, 1.4, 2.35, 1.4, 1.4, 1.4,
+            2.1, 2.35, 1.4, 2.35, 1.4, 1.4, 1.4,
+      ]
+  disable_joints: false
+
+  # 关节限位配置
+  joint_limits:
+    # 腿部关节
+    l_hip_pitch:     {min: -3.14, max: 3.14}   # -180° to 180°
+    l_hip_roll:      {min: -0.47, max: 2.62}   # -27° to 150°
+    l_hip_yaw:       {min: -1.57, max: 4.54}   # -90° to 260°
+    l_knee:          {min: -0.09, max: 2.53}   # -5° to 145°
+    l_ankle_pitch:   {min: -1.22, max: 0.52}   # -70° to 30°
+    l_ankle_roll:    {min: -0.52, max: 0.52}   # -30° to 30°
+
+    r_hip_pitch:     {min: -3.14, max: 3.14}   # -180° to 180°
+    r_hip_roll:      {min: -0.47, max: 2.62}   # -27° to 150°
+    r_hip_yaw:       {min: -1.57, max: 4.54}   # -90° to 260°
+    r_knee:          {min: -0.09, max: 2.53}   # -5° to 145°
+    r_ankle_pitch:   {min: -1.22, max: 0.52}   # -70° to 30°
+    r_ankle_roll:    {min: -0.52, max: 0.52}   # -30° to 30°
+
+    # 腰部关节
+    waist_yaw:       {min: -2.97, max: 3.14}   # -170° to 180°
+    waist_roll:      {min: -0.52, max: 0.52}   # -30° to 30°
+    waist_pitch:     {min: -0.52, max: 1.05}   # -30° to 60°
+
+    # 左臂关节
+    l_shoulder_pitch: {min: -2.97, max: 2.97}  # -170° to 170°
+    l_shoulder_roll:  {min: -0.26, max: 3.40}  # -15° to 195°
+    l_shoulder_yaw:   {min: -2.97, max: 2.97}  # -170° to 170°
+    l_elbow:          {min: -2.62 , max: 0.26}  # -150° to 15°
+    l_wrist_yaw:      {min: -2.97, max: 2.97}  # -170° to 170°
+    l_wrist_pitch:    {min: -1.31, max: 1.40}  # -75° to 80°
+    l_wrist_roll:     {min: -1.05, max: 0.79}  # -60° to 45°
+
+    # 右臂关节
+    r_shoulder_pitch: {min: -2.97, max: 2.97}  # -170° to 170°
+    r_shoulder_roll:  {min: -3.40, max: 0.26}  # -195° to 15°
+    r_shoulder_yaw:   {min: -2.97, max: 2.97}  # -170° to 170°
+    r_elbow:          {min: -2.62, max: 0.26}  # -150° to 15°
+    r_wrist_yaw:      {min: -2.97, max: 2.97}  # -170° to 170°
+    r_wrist_pitch:    {min: -1.31, max: 1.40}  # -75° to 80°
+    r_wrist_roll:     {min: -0.79, max: 1.05}  # -45° to 60°
+
+
+  # 过渡时间配置
+  trans_time:
+    # 1. 全局默认时间（优先级最低）
+    default_time: 1
+    # 2. 各状态的配置
+    state_trans_time:
+      STOP:
+        default_trans_time: 0.0
+      
+      DAMPING:
+        default_trans_time: 0.0
+      
+      STAND:
+        # 该状态的默认时间（覆盖全局默认）
+        default_trans_time: 0.5
+        # 3. 特定前置状态的时间（优先级最高）
+        last_state:
+          NAVIGATE: 0.1      # 从NAVIGATE进入STAND
+          HBWALK: 0.8        # 从HBWALK进入STAND
+      STAND_NAV_MOE:
+        default_trans_time: 0.5
+        last_state:
+          NAVIGATE: 0.1      # 从NAVIGATE进入STAND
+          HBWALK: 0.8        # 从HBWALK进入STAND
+      FAN:
+        default_trans_time: 0.2
+      BACK_FLIP:
+        default_trans_time: 0.2
+      NIUKUA:
+        default_trans_time: 0.0
+          # 其他未列出的前置状态，使用 default_trans_time 或全局默认
+      NAVIGATE:
+        last_state:
+          STAND: 0.1  # 从STAND进入NAVIGATE
+      
+      SWR:
+        default_trans_time: 0.5
+        last_state:
+          LAYUP: 0.1
+
+        
+      HYL:
+        default_trans_time: 0.5
+      
+      SITRISEZERO:
+        default_trans_time: 0.0
+      
+      STANDZERO:
+        default_trans_time: 0.0
+      
+      LAYUPZERO:
+        default_trans_time: 0.0
+
+      NEWISLAND:
+        default_trans_time: 0.5
+
+      LIEDOWN:
+        default_trans_time: 0.1
+
+    
+  # 脚踝并联关节Kp,Kd
+  ankle_kp_p: [15.0, 15.0, 15.0, 15.0] # ankle_pitch_left, ankle_roll_left, ankle_pitch_right, ankle_roll_right
+  ankle_kd_p: [1.25, 1.25, 1.25, 1.25]
+  # 通讯方式 - 底层电机 RPC (xmigcs -> robot_control 电机命令/状态回读)
+  # 与 HRIC 通道是两条独立 RPC, 不互相影响.
+  #   lpc          : 同进程 (RLPythonExecutor 嵌入), 一般不用
+  #   shm_rpc      : iceoryx2 共享内存 (**默认**). 启动顺序: 先 robot_control 后 xmigcs
+  #                  (robot_control 是 server, xmigcs 是 client; iceoryx2 谁先到谁创 service files)
+  #   tcp_rpc      : coro_rpc TCP, 启动顺序无关 (client 带重连), localhost fallback / 调试
+  #                  切 tcp_rpc 时 robot_control_xos.sh 需 --enable-tcp=true
+  #   ros2 / ros2_bridge: 走 ROS2 topic, 仅调试用
+  comm_mode: "ros2"
+
+  cmd_limits:
+    initial_height: 0.957
+    max_height: 0.991
+    min_height: 0.791
+    x_command_offset: 0.0
+    y_command_offset: 0.0
+    yaw_command_offset: 0.0
+    max_x_plus_speed: 2.2
+    max_x_minus_speed: 0.8
+    max_y_speed: 0.5
+    max_yaw_speed: 2.0
+    # 状态速度配置
+    state_speed_limits:
+      NAVIGATE:
+        max_x_plus: 1.2
+        max_x_minus: 0.6
+        max_y: 0.6
+        max_yaw: 1.0
+        x_command_offset: 0.0
+        y_command_offset: 0.0
+        yaw_command_offset: 0.0
+      HBWALK:
+        max_x_plus: 0.8
+        max_x_minus: 0.4
+        max_y: 0.6
+        max_yaw: 1.0
+        x_command_offset: 0.0
+        y_command_offset: 0.0
+        yaw_command_offset: 0.0
+      SWR:
+        max_x_plus: 2.2
+        max_x_minus: 0.8
+        max_y: 0.5
+        max_yaw: 2.0
+        x_command_offset: 0.0
+        y_command_offset: 0.0
+        yaw_command_offset: 0.0
+        walk_max_x_plus: 1.1
+        run_zone_start: 0.9
+        run_ramp_time: 5.0
+  
+  moe_state_commands_map:
+    gotoSTAND:
+      nav_stand_mode: 0
+    gotoNAVIGATE:
+      nav_stand_mode: 1
+  
+  moe_states:
+    - STAND_NAV_MOE

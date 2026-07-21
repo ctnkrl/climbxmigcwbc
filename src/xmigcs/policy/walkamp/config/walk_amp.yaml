@@ -1,0 +1,68 @@
+# model_path: "policy_walkrunmoe_05123_9500.onnx"  #policy_walkrunmoe_03181_49999.onnx/policy_walkrunmoe_03182_38500.onnx
+model_path: "20260522_114731_90000.onnx"
+# model_path: "walkrunmoe05131_10000.onnx"
+
+motor_num: 31        # 电机数量
+actions_size: 23     # action的大小
+dt: 0.01
+warm_start_time: 0.0
+control:
+  # gait_cycle_period: 0.9
+  # action_scale: 0.25               # 动作缩放比例
+  decimation: 1                   # 策略下发频率控制
+
+commands:
+  yaw_only_lin_vel_range: [-0.03, 0.03]
+  yaw_only_ang_vel_deadzone: 0.2
+  straight_lateral_vel_range: [-0.05, 0.05]
+  straight_ang_vel_range: [-0.40, 0.40]
+  lateral_forward_vel_range: [-0.05, 0.05]
+  lateral_ang_vel_range: [-0.5, 0.5]
+  lateral_vel_deadzone: 0.2
+  zero_epsilon: 1.0e-6
+  policy_cmd_smooth_alpha: 0.2
+  policy_cmd_smooth_snap_epsilon: 1.0e-3
+  ranges:
+    lin_vel_x: [-0.8, 1.1]
+    lin_vel_y: [-0.5, 0.5]
+    ang_vel_z: [-3.14, 3.14]
+
+normalization:
+  clip_scales:
+    clip_observations: 100. #18.0mlp
+    clip_actions: 100. #18.0
+  obs_scales:
+    lin_vel: 1.0                  # 线速度缩放因子
+    ang_vel: 1.0                  # 角速度缩放因子
+    dof_pos: 1.0                  # 关节位置缩放因子
+    dof_vel: 1.0                  # 关节速度缩放因子
+
+size:
+  num_hist: 10                     # 历史观测帧数
+  observations_size: 85          # 单帧观测长度
+
+# gains:
+#   kp: [
+#     300.0, 300.0, 150.0, 350.0, 30.0, 16.8,
+#     300.0, 300.0, 150.0, 350.0, 30.0, 16.8,
+#     400.0, 400.0, 400.0,
+#     150.0, 50.0, 50.0, 150.0, 10, 10, 10,
+#     150.0, 50.0, 50.0, 150.0, 10, 10, 10
+#   ]
+#   kd: [
+#     10.0, 10.0, 5.0, 10.0, 2.5, 0.5,
+#     10.0, 10.0, 5.0, 10.0, 2.5, 0.5,
+#     10.0, 10.0,5.0,
+#     5.0, 2.5, 2.5, 5, 1.0, 1.0, 1.0,
+#     5.0, 2.5, 2.5, 5, 1.0, 1.0, 1.0
+#   ]
+
+
+# init_state:
+#   default_joint_angles: [
+#     -0.2, 0.0, -0.0, 0.42, -0.23, 0.0,   # 左腿
+#     -0.2, 0.0, -0.0, 0.42, -0.23, 0.0,   # 右腿
+#     0.0, 0.0, 0.0,                   # 腰
+#     0.35, 0.18, 0.0, -0.87, # 左臂
+#     0.35, -0.18, 0.0, -0.87, # 右臂
+#   ]

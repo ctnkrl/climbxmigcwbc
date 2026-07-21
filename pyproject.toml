@@ -1,0 +1,49 @@
+[tool.uv]
+index-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel", "Cython>=0.29", "numpy"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xmigcs"
+version = "26.7.1+alpha"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12, <3.13"
+dependencies = [
+    "numpy==2.3.5",
+    "onnx==1.20.1",
+    "onnxruntime==1.24.2",
+    "pandas==3.0.1",
+    "pin==3.9.0",
+    "pyyaml==6.0.3",
+    "scipy==1.17.1",
+    "transforms3d==0.4.2",
+]
+
+# 明确指定包含哪些文件
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"xmigcs" = [
+    "**/*.yaml",
+    "**/*.yml",
+    "**/*.json",
+    "**/*.onnx",
+    "**/*.ipynb",
+    "**/*.so",
+    "**/__init__.py",
+    "**/*.urdf",
+    "**/*.npz",
+]
+
+# 排除 .py 文件
+[tool.setuptools.exclude-package-data]
+"xmigcs" = ["**/*.py"]
+
+[project.scripts]
+xmigcs = "xmigcs.rl_control_node:main"
+xmigcs_sim = "xmigcs.rl_control_node_sim:main"
+xmigcs_joystick = "xmigcs.joystick_bridge_node:main"
