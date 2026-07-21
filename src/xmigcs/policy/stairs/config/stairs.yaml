@@ -1,0 +1,153 @@
+onnx_path: "pcvis_lite_teacher707000_model79000_globalref.onnx"
+# reference_source:
+#   embedded_npz  : route A, ONNX 内嵌多 NPZ reference，用 motion_id/local_step 播放
+#   realtime_gmr  : route B, 从 RobotData realtime reference cache 读取在线 reference
+reference_source: embedded_npz
+# legacy alias; keep false unless reference_source is realtime_gmr.
+use_realtime_gmr: false
+gmr_reference:
+  max_age_s: 0.25
+warm_start_time: 0.0
+# Multi-motion ONNX exported by BeyondMimic stores all NPZ frames as one global
+# timeline. Pick one motion here; fsm_stairs.py reads offsets/lengths from ONNX
+# metadata and sends global_time_step = motion_offset + local_step.
+motion_id: 6
+# motion_name can be used instead of motion_id after exporting metadata.
+# 原速 0.6m: motion_id 6/7/8; spd110: 15/16/17; spd090: 24/25/26.
+# motion_name: "climb0630/Box_3_take001_Skeleton0"
+
+body_names : [
+    "pelvis",
+    "hip_pitch_l_link",
+    "hip_roll_l_link",
+    "hip_yaw_l_link",
+    "knee_pitch_l_link",
+    "ankle_pitch_l_link",
+    "ankle_roll_l_link",
+    "hip_pitch_r_link",
+    "hip_roll_r_link",
+    "hip_yaw_r_link",
+    "knee_pitch_r_link",
+    "ankle_pitch_r_link",
+    "ankle_roll_r_link",
+    "waist_yaw_link",
+    "waist_roll_link",
+    "waist_pitch_link",
+    "shoulder_pitch_l_link",
+    "shoulder_roll_l_link",
+    "shoulder_yaw_l_link",
+    "elbow_pitch_l_link",
+    "shoulder_pitch_r_link",
+    "shoulder_roll_r_link",
+    "shoulder_yaw_r_link",
+    "elbow_pitch_r_link",
+]
+anchor_body : "pelvis"
+
+# Terrain DexEVT Wo-State-Estimation policy with term-major proprio history:
+# command[t-4..t], motion_anchor_ori_b[t-4..t], base_ang_vel[t-4..t],
+# joint_pos[t-4..t], joint_vel[t-4..t], actions[t-4..t], height_scan[t]
+# command: joint_pos(23) + joint_vel(23) + ref_anchor_lin_vel_b(3)
+#        + ref_anchor_ang_vel_b(3) = 52
+# proprio history: (52 + 6 + 3 + 23 + 23 + 23) * 5 = 650
+# terrain_scan current only: 33*21*3 = 2079
+# total: 2729
+num_obs : 2729
+proprio_history_length: 5
+command_includes_anchor_velocity: true
+
+locked_joint_map : [
+ 0, 1, 2, 3, 4, 5,
+ 6, 7, 8, 9, 10, 11,
+ 12, 13, 14,
+ 15, 16, 17, 18, 
+ 22, 23, 24, 25 
+]
+
+joint_xml: [
+    "hip_pitch_l_joint", "hip_roll_l_joint", "hip_yaw_l_joint",
+    "knee_pitch_l_joint", "ankle_pitch_l_joint", "ankle_roll_l_joint",
+    "hip_pitch_r_joint", "hip_roll_r_joint", "hip_yaw_r_joint",
+    "knee_pitch_r_joint", "ankle_pitch_r_joint", "ankle_roll_r_joint",
+    "waist_yaw_joint", "waist_roll_joint", "waist_pitch_joint",
+    "shoulder_pitch_l_joint", "shoulder_roll_l_joint", "shoulder_yaw_l_joint",
+    "elbow_pitch_l_joint",
+    "shoulder_pitch_r_joint", "shoulder_roll_r_joint", "shoulder_yaw_r_joint",
+    "elbow_pitch_r_joint",
+]
+
+terrain_scan:
+  enabled: true
+  topic: "/tian/depth/points"
+  scan_dim: [33, 21, 3]
+
+kps: [
+        300, 300, 150, 350, 30, 16.8,
+        300, 300, 150, 350, 30, 16.8,
+        400, 400, 400,
+        150, 150, 130, 130, 50, 50, 50,
+        150, 150, 130, 130, 50, 50, 50,
+]
+kds: [
+        15, 15, 7.5, 15, 3.75, 2.1,
+        15, 15, 7.5, 15, 3.75, 2.1,
+        20, 20, 20,
+        7.4, 7.4, 5.9, 5.9, 2.5, 2.5, 2.5,
+        7.4, 7.4, 5.9, 5.9, 2.5, 2.5, 2.5,
+]
+# motion_length: 140 
+
+# tau_limit: [88.0,  88.0, 88.0,
+#                    88.0,  88.0, 88.0,
+#                    88.0,  88.0, 88.0,
+#                   139.0, 139.0      , 25.0, 25.0,
+#                    50.0,  50.0      , 25.0, 25.0,
+#                    50.0,  50.0      , 25.0, 25.0,
+#                                       25.0, 25.0,
+#                                        5.0,  5.0,
+#                                        5.0,  5.0,
+#                                        5.0,  5.0
+#            ]
+
+# kp_lab: [40.179, 40.179, 40.179, 99.098, 99.098, 28.501, 
+#           40.179, 40.179, 28.501, 99.098, 99.098, 14.251, 
+#           14.251, 28.501, 28.501, 14.251, 14.251, 28.501, 
+#           28.501, 14.251, 14.251, 14.251, 14.251, 14.251, 
+#           14.251, 16.778, 16.778, 16.778, 16.778]
+
+# kd_lab: [2.558, 2.558, 2.558, 6.309, 6.309, 1.814, 
+#           2.558, 2.558, 1.814, 6.309, 6.309, 0.907, 
+#           0.907, 1.814, 1.814, 0.907, 0.907, 1.814, 
+#           1.814, 0.907, 0.907, 0.907, 0.907, 0.907, 
+#           0.907, 1.068, 1.068, 1.068, 1.068]
+
+# default_angles_lab: [-0.312, -0.312, 0.0, 0.0, 0.0, 0.0, 
+#                     0.0, 0.0, 0.0, 0.669, 0.669, 0.2, 
+#                     0.2, -0.363, -0.363, 0.2, -0.2, 0.0, 
+#                     0.0, 0.0, 0.0, 0.6, 0.6, 0.0, 
+#                     0.0, 0.0, 0.0, 0.0, 0.0]
+
+# action_scale_lab: [0.548, 0.548, 0.548, 0.351, 0.351, 0.439, 
+#                   0.548, 0.548, 0.439, 0.351, 0.351, 0.439, 
+#                   0.439, 0.439, 0.439, 0.439, 0.439, 0.439, 
+#                   0.439, 0.439, 0.439, 0.439, 0.439, 0.439, 
+#                   0.439, 0.075, 0.075, 0.075, 0.075]
+
+num_actions: 23
+motor_nums: 29
+# num_obs: 154
+hold_final_reference: false
+
+# mj2lab: [0, 6, 12,
+#                   1, 7, 13,
+#                   2, 8, 14,
+#                   3, 9    , 15, 22,
+#                   4, 10   , 16, 23,
+#                   5, 11   , 17, 24,
+#                             18, 25,
+#                             19, 26,
+#                             20, 27,
+#                             21, 28]
+# history_length: 4
+physical_dt: 0.01
+decimation: 1
